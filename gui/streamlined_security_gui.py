@@ -64,13 +64,13 @@ class StreamlinedSecurityGUI:
         """Setup main window"""
         self.root.title("🛡️ Streamlined Linux Security Center")
         
-        # Get screen dimensions for full utilization
+        # Set a reasonable fixed window size (not full screen)
+        width = 1400
+        height = 900
+        
+        # Get screen dimensions for centering
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        
-        # Use 90% of screen width and 85% of screen height for maximum space
-        width = int(screen_width * 0.9)
-        height = int(screen_height * 0.85)
         
         self.root.geometry(f"{width}x{height}")
         self.root.configure(bg='#0a0a0a')
@@ -81,8 +81,9 @@ class StreamlinedSecurityGUI:
         y = (screen_height // 2) - (height // 2)
         self.root.geometry(f'{width}x{height}+{x}+{y}')
         
-        # Make window resizable for even more flexibility
+        # Make window resizable for flexibility
         self.root.resizable(True, True)
+        self.root.minsize(1200, 800)  # Set minimum size
         self.root.minsize(1200, 800)  # Minimum size to maintain layout integrity
         
     def setup_variables(self):
@@ -123,46 +124,229 @@ class StreamlinedSecurityGUI:
         dashboard_frame = tk.Frame(self.notebook, bg='#0a0a0a')
         self.notebook.add(dashboard_frame, text="🎯 Security Dashboard")
         
-        # Main title with animated effect
+        # Main title
         title_frame = tk.Frame(dashboard_frame, bg='#0a0a0a')
-        title_frame.pack(fill='x', pady=10)
+        title_frame.pack(fill='x', pady=(5, 10))
         
         tk.Label(title_frame, text="🎯 SECURITY COMMAND CENTER DASHBOARD", 
-                font=('Arial', 18, 'bold'), fg='#00ff00', bg='#0a0a0a').pack()
+                font=('Arial', 16, 'bold'), fg='#00ff00', bg='#0a0a0a').pack()
         
         tk.Label(title_frame, text="Real-Time Security Monitoring & Threat Analysis", 
-                font=('Arial', 12), fg='#888888', bg='#0a0a0a').pack()
+                font=('Arial', 10), fg='#888888', bg='#0a0a0a').pack()
         
-        # Create scrollable frame for dashboard content
-        canvas = tk.Canvas(dashboard_frame, bg='#0a0a0a', highlightthickness=0)
-        scrollbar = ttk.Scrollbar(dashboard_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg='#0a0a0a')
+        # Create main container without scrollbar - using grid layout for full width utilization
+        main_container = tk.Frame(dashboard_frame, bg='#0a0a0a')
+        main_container.pack(fill='both', expand=True, padx=10, pady=5)
         
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
+        # Configure grid weights for full width utilization
+        main_container.grid_columnconfigure(0, weight=1)  # Left column
+        main_container.grid_columnconfigure(1, weight=1)  # Right column
+        main_container.grid_rowconfigure(0, weight=1)     # Top row
+        main_container.grid_rowconfigure(1, weight=1)     # Bottom row
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        # Create four main sections using 2x2 grid for maximum space utilization
         
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        # TOP LEFT: System Status & Security Metrics Combined
+        top_left_frame = tk.Frame(main_container, bg='#0a0a0a')
+        top_left_frame.grid(row=0, column=0, sticky='nsew', padx=(0, 5), pady=(0, 5))
+        self.create_system_security_combined_section(top_left_frame)
         
-        # Create dashboard sections
-        self.create_system_status_section(scrollable_frame)
-        self.create_security_metrics_section(scrollable_frame)
-        self.create_threat_detection_section(scrollable_frame)
-        self.create_network_monitor_section(scrollable_frame)
-        self.create_quick_tools_section(scrollable_frame)
+        # TOP RIGHT: Network Monitor & Quick Tools Combined
+        top_right_frame = tk.Frame(main_container, bg='#0a0a0a')
+        top_right_frame.grid(row=0, column=1, sticky='nsew', padx=(5, 0), pady=(0, 5))
+        self.create_network_tools_combined_section(top_right_frame)
+        
+        # BOTTOM LEFT: Threat Detection with Control Panel
+        bottom_left_frame = tk.Frame(main_container, bg='#0a0a0a')
+        bottom_left_frame.grid(row=1, column=0, sticky='nsew', padx=(0, 5), pady=(5, 0))
+        self.create_threat_detection_section(bottom_left_frame)
+        
+        # BOTTOM RIGHT: Live Statistics & Performance Metrics
+        bottom_right_frame = tk.Frame(main_container, bg='#0a0a0a')
+        bottom_right_frame.grid(row=1, column=1, sticky='nsew', padx=(5, 0), pady=(5, 0))
+        self.create_live_statistics_section(bottom_right_frame)
         
         # Start dashboard updates
         self.update_dashboard()
+
+    def create_system_security_combined_section(self, parent):
+        """Create combined system status and security metrics section"""
+        # System Status Section
+        status_frame = tk.LabelFrame(parent, text=" 🖥️ SYSTEM STATUS ", 
+                                   font=('Arial', 12, 'bold'), fg='#00ffff', bg='#1a1a1a')
+        status_frame.pack(fill='x', pady=(0, 5))
         
-        # Bind mousewheel to canvas
-        def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        # System metrics in 3x2 grid
+        metrics_frame = tk.Frame(status_frame, bg='#1a1a1a')
+        metrics_frame.pack(fill='x', padx=10, pady=8)
+        
+        # Configure grid for equal distribution
+        for i in range(3):
+            metrics_frame.grid_columnconfigure(i, weight=1)
+        
+        # Row 1
+        self.create_metric_widget(metrics_frame, 0, 0, "🔥 CPU", "cpu_label", '#ff6666')
+        self.create_metric_widget(metrics_frame, 0, 1, "💾 MEMORY", "memory_label", '#66b3ff')
+        self.create_metric_widget(metrics_frame, 0, 2, "💿 STORAGE", "disk_label", '#ffaa00')
+        
+        # Row 2
+        self.create_metric_widget(metrics_frame, 1, 0, "⏰ UPTIME", "uptime_label", '#88ff88')
+        self.create_metric_widget(metrics_frame, 1, 1, "⚙️ PROCESSES", "process_label", '#ffcc66')
+        self.create_metric_widget(metrics_frame, 1, 2, "🌐 NETWORK", "network_label", '#ff88ff')
+        
+        # Security Metrics Section
+        security_frame = tk.LabelFrame(parent, text=" 🛡️ SECURITY STATUS ", 
+                                     font=('Arial', 12, 'bold'), fg='#00ff00', bg='#1a1a1a')
+        security_frame.pack(fill='both', expand=True, pady=(5, 0))
+        
+        # Security indicators in 3x2 grid
+        sec_metrics_frame = tk.Frame(security_frame, bg='#1a1a1a')
+        sec_metrics_frame.pack(fill='x', padx=10, pady=8)
+        
+        # Configure grid for equal distribution
+        for i in range(3):
+            sec_metrics_frame.grid_columnconfigure(i, weight=1)
+        
+        # Row 1
+        self.create_status_widget(sec_metrics_frame, 0, 0, "🔥 FIREWALL", "firewall_status")
+        self.create_status_widget(sec_metrics_frame, 0, 1, "🦠 ANTIVIRUS", "antivirus_status")
+        self.create_status_widget(sec_metrics_frame, 0, 2, "🔄 UPDATES", "updates_status")
+        
+        # Row 2
+        self.create_status_widget(sec_metrics_frame, 1, 0, "🔐 ENCRYPTION", "encryption_status")
+        self.create_status_widget(sec_metrics_frame, 1, 1, "🔑 SSH", "ssh_status")
+        self.create_status_widget(sec_metrics_frame, 1, 2, "🕵️ IDS", "ids_status")
+
+    def create_network_tools_combined_section(self, parent):
+        """Create combined network monitor and quick tools section"""
+        # Network Monitor Section
+        network_frame = tk.LabelFrame(parent, text=" 🌐 NETWORK SECURITY ", 
+                                    font=('Arial', 12, 'bold'), fg='#66b3ff', bg='#1a1a1a')
+        network_frame.pack(fill='x', pady=(0, 5))
+        
+        # Network stats in 2x2 grid
+        net_stats_frame = tk.Frame(network_frame, bg='#1a1a1a')
+        net_stats_frame.pack(fill='x', padx=10, pady=8)
+        
+        # Configure grid
+        for i in range(2):
+            net_stats_frame.grid_columnconfigure(i, weight=1)
+        
+        # Row 1
+        self.create_metric_widget(net_stats_frame, 0, 0, "🔗 CONNECTIONS", "connections_label", '#66b3ff')
+        self.create_metric_widget(net_stats_frame, 0, 1, "🚪 OPEN PORTS", "ports_label", '#ffaa00')
+        
+        # Row 2
+        self.create_metric_widget(net_stats_frame, 1, 0, "📊 BANDWIDTH", "bandwidth_label", '#88ff88')
+        self.create_metric_widget(net_stats_frame, 1, 1, "🚫 BLOCKED", "blocked_attacks", '#ff6666')
+        
+        # Quick Tools Section
+        tools_frame = tk.LabelFrame(parent, text=" ⚡ QUICK TOOLS ", 
+                                  font=('Arial', 12, 'bold'), fg='#ffaa00', bg='#1a1a1a')
+        tools_frame.pack(fill='both', expand=True, pady=(5, 0))
+        
+        # Quick tools in compact grid
+        buttons_container = tk.Frame(tools_frame, bg='#1a1a1a')
+        buttons_container.pack(fill='both', expand=True, padx=10, pady=8)
+        
+        # Configure grid for buttons
+        for i in range(2):
+            buttons_container.grid_columnconfigure(i, weight=1)
+        for i in range(4):
+            buttons_container.grid_rowconfigure(i, weight=1)
+        
+        # Quick tool buttons
+        tools = [
+            ("🔒 Hash", self.quick_hash, '#00ff00'),
+            ("🔐 RSA", self.quick_rsa, '#66b3ff'),
+            ("🔑 Password", self.quick_password, '#ffaa00'),
+            ("📊 Monitor", self.quick_sysinfo, '#ff88ff'),
+            ("🌐 Network", self.quick_network, '#88ffff'),
+            ("🛡️ Security", self.quick_security, '#ff6666'),
+            ("🔍 Analysis", self.quick_file_analysis, '#ff9999'),
+            ("📈 Charts", self.quick_charts, '#99ffff')
+        ]
+        
+        for i, (text, command, color) in enumerate(tools):
+            row = i // 2
+            col = i % 2
+            btn = tk.Button(buttons_container, text=text, command=command,
+                           bg='#2a2a2a', fg=color, font=('Arial', 10, 'bold'),
+                           relief='raised', bd=1)
+            btn.grid(row=row, column=col, sticky='nsew', padx=2, pady=2)
+
+    def create_live_statistics_section(self, parent):
+        """Create live statistics and performance section"""
+        # Performance Section
+        perf_frame = tk.LabelFrame(parent, text=" 📊 PERFORMANCE METRICS ", 
+                                 font=('Arial', 12, 'bold'), fg='#ffcc66', bg='#1a1a1a')
+        perf_frame.pack(fill='x', pady=(0, 5))
+        
+        # Performance metrics
+        perf_metrics_frame = tk.Frame(perf_frame, bg='#1a1a1a')
+        perf_metrics_frame.pack(fill='x', padx=10, pady=8)
+        
+        # Configure grid
+        for i in range(2):
+            perf_metrics_frame.grid_columnconfigure(i, weight=1)
+        
+        # Performance indicators
+        self.create_status_widget(perf_metrics_frame, 0, 0, "🛡️ SECURITY LEVEL", "security_level")
+        self.create_status_widget(perf_metrics_frame, 0, 1, "🚨 THREAT LEVEL", "threat_level")
+        
+        # Security Tips Section
+        tips_frame = tk.LabelFrame(parent, text=" 💡 SECURITY INTELLIGENCE ", 
+                                 font=('Arial', 12, 'bold'), fg='#ffaa00', bg='#1a1a1a')
+        tips_frame.pack(fill='both', expand=True, pady=(5, 0))
+        
+        # Tip content
+        tip_container = tk.Frame(tips_frame, bg='#1a1a1a')
+        tip_container.pack(fill='both', expand=True, padx=10, pady=8)
+        
+        self.security_tip = tk.Label(tip_container, 
+                                   text="Always use strong, unique passwords for each account!",
+                                   font=('Arial', 11), fg='#ffffff', bg='#1a1a1a',
+                                   wraplength=400, justify='left')
+        self.security_tip.pack(fill='both', expand=True)
+        
+        # Active scans indicator
+        scan_info_frame = tk.Frame(tips_frame, bg='#2a2a2a', relief='solid', bd=1)
+        scan_info_frame.pack(fill='x', padx=10, pady=(0, 8))
+        
+        tk.Label(scan_info_frame, text="📊 ACTIVE SCANS", 
+                font=('Arial', 10, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=2)
+        
+        self.active_scans = tk.Label(scan_info_frame, text="0", 
+                                   font=('Arial', 16, 'bold'), fg='#66b3ff', bg='#2a2a2a')
+        self.active_scans.pack(pady=2)
+
+    def create_metric_widget(self, parent, row, col, title, attr_name, color):
+        """Create a metric display widget"""
+        widget_frame = tk.Frame(parent, bg='#2a2a2a', relief='solid', bd=1)
+        widget_frame.grid(row=row, column=col, sticky='nsew', padx=2, pady=2)
+        
+        tk.Label(widget_frame, text=title, font=('Arial', 9, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
+        
+        label = tk.Label(widget_frame, text="0", font=('Arial', 14, 'bold'), 
+                        fg=color, bg='#2a2a2a')
+        label.pack(pady=2)
+        
+        setattr(self, attr_name, label)
+
+    def create_status_widget(self, parent, row, col, title, attr_name):
+        """Create a status display widget"""
+        widget_frame = tk.Frame(parent, bg='#2a2a2a', relief='solid', bd=1)
+        widget_frame.grid(row=row, column=col, sticky='nsew', padx=2, pady=2)
+        
+        tk.Label(widget_frame, text=title, font=('Arial', 9, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
+        
+        label = tk.Label(widget_frame, text="CHECKING...", font=('Arial', 10, 'bold'), 
+                        fg='#ffaa00', bg='#2a2a2a')
+        label.pack(pady=2)
+        
+        setattr(self, attr_name, label)
 
     def create_system_status_section(self, parent):
         """Create system status monitoring section"""
@@ -339,62 +523,65 @@ class StreamlinedSecurityGUI:
 
     def create_threat_detection_section(self, parent):
         """Create threat detection section"""
-        threat_frame = tk.LabelFrame(parent, text=" ⚠️ ADVANCED THREAT DETECTION ENGINE ", 
-                                   font=('Arial', 16, 'bold'), fg='#ff6666', bg='#1a1a1a')
-        threat_frame.pack(fill='x', padx=15, pady=15)
+        threat_frame = tk.LabelFrame(parent, text=" ⚠️ THREAT DETECTION ENGINE ", 
+                                   font=('Arial', 12, 'bold'), fg='#ff6666', bg='#1a1a1a')
+        threat_frame.pack(fill='both', expand=True)
         
-        # Create horizontal layout for threat detection
-        main_threat_frame = tk.Frame(threat_frame, bg='#1a1a1a')
-        main_threat_frame.pack(fill='x', padx=20, pady=15)
+        # Main container
+        main_container = tk.Frame(threat_frame, bg='#1a1a1a')
+        main_container.pack(fill='both', expand=True, padx=10, pady=8)
         
-        # Left side - Threat log display (takes 70% width)
-        log_container = tk.Frame(main_threat_frame, bg='#1a1a1a')
-        log_container.pack(side='left', fill='both', expand=True, padx=(0, 15))
+        # Configure grid for responsive layout
+        main_container.grid_columnconfigure(0, weight=3)  # Log takes more space
+        main_container.grid_columnconfigure(1, weight=1)  # Controls take less space
+        main_container.grid_rowconfigure(0, weight=1)
         
-        tk.Label(log_container, text="🔍 Real-Time Threat Analysis & Security Events:", 
-                font=('Arial', 14, 'bold'), fg='#ffffff', bg='#1a1a1a').pack(anchor='w', pady=(0, 10))
+        # Left side - Threat log
+        log_frame = tk.Frame(main_container, bg='#1a1a1a')
+        log_frame.grid(row=0, column=0, sticky='nsew', padx=(0, 5))
         
-        self.threat_log = scrolledtext.ScrolledText(log_container, height=8, bg='#0a0a0a',
-                                                   fg='#ff6666', font=('Courier New', 11),
-                                                   relief='solid', bd=2)
+        tk.Label(log_frame, text="🔍 Security Events:", 
+                font=('Arial', 10, 'bold'), fg='#ffffff', bg='#1a1a1a').pack(anchor='w', pady=(0, 5))
+        
+        self.threat_log = scrolledtext.ScrolledText(log_frame, height=12, bg='#0a0a0a',
+                                                   fg='#ff6666', font=('Courier New', 9),
+                                                   relief='solid', bd=1)
         self.threat_log.pack(fill='both', expand=True)
         
-        # Right side - Control panel (takes 30% width)
-        control_panel = tk.Frame(main_threat_frame, bg='#2a2a2a', relief='solid', bd=2)
-        control_panel.pack(side='right', fill='y', padx=(15, 0), ipadx=15, ipady=15)
+        # Right side - Compact control panel
+        control_frame = tk.Frame(main_container, bg='#2a2a2a', relief='solid', bd=1)
+        control_frame.grid(row=0, column=1, sticky='nsew', padx=(5, 0))
         
-        tk.Label(control_panel, text="🛡️ SECURITY CONTROLS", 
-                font=('Arial', 13, 'bold'), fg='#ff6666', bg='#2a2a2a').pack(pady=10)
+        tk.Label(control_frame, text="🛡️ CONTROLS", 
+                font=('Arial', 10, 'bold'), fg='#ff6666', bg='#2a2a2a').pack(pady=5)
         
-        # Quick scan button
-        scan_btn = tk.Button(control_panel, text="🔍 QUICK SECURITY SCAN", 
+        # Scan buttons
+        scan_btn = tk.Button(control_frame, text="🔍 QUICK SCAN", 
                            command=self.run_quick_scan,
-                           bg='#ff6666', fg='#000000', font=('Arial', 12, 'bold'),
-                           relief='raised', bd=2, padx=15, pady=8)
-        scan_btn.pack(pady=8, fill='x')
+                           bg='#ff6666', fg='#000000', font=('Arial', 9, 'bold'),
+                           relief='raised', bd=1)
+        scan_btn.pack(pady=3, padx=5, fill='x')
         
-        # Deep scan button
-        deep_scan_btn = tk.Button(control_panel, text="🕵️ DEEP SYSTEM SCAN", 
+        deep_scan_btn = tk.Button(control_frame, text="🕵️ DEEP SCAN", 
                                 command=self.run_deep_scan,
-                                bg='#ff8800', fg='#000000', font=('Arial', 12, 'bold'),
-                                relief='raised', bd=2, padx=15, pady=8)
-        deep_scan_btn.pack(pady=8, fill='x')
+                                bg='#ff8800', fg='#000000', font=('Arial', 9, 'bold'),
+                                relief='raised', bd=1)
+        deep_scan_btn.pack(pady=3, padx=5, fill='x')
         
-        # Threat level indicator
-        tk.Label(control_panel, text="🚨 THREAT LEVEL", 
-                font=('Arial', 11, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(15, 5))
+        # Status indicators
+        tk.Label(control_frame, text="🚨 THREAT", 
+                font=('Arial', 9, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(10, 2))
         
-        self.threat_level = tk.Label(control_panel, text="LOW", 
-                                   font=('Arial', 18, 'bold'), fg='#00ff00', bg='#2a2a2a')
-        self.threat_level.pack(pady=5)
+        self.threat_level = tk.Label(control_frame, text="LOW", 
+                                   font=('Arial', 12, 'bold'), fg='#00ff00', bg='#2a2a2a')
+        self.threat_level.pack(pady=2)
         
-        # Active scans counter
-        tk.Label(control_panel, text="📊 ACTIVE SCANS", 
-                font=('Arial', 11, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(15, 5))
+        tk.Label(control_frame, text="📊 SCANS", 
+                font=('Arial', 9, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(10, 2))
         
-        self.active_scans = tk.Label(control_panel, text="0", 
-                                   font=('Arial', 18, 'bold'), fg='#66b3ff', bg='#2a2a2a')
-        self.active_scans.pack(pady=5)
+        self.active_scans = tk.Label(control_frame, text="0", 
+                                   font=('Arial', 12, 'bold'), fg='#66b3ff', bg='#2a2a2a')
+        self.active_scans.pack(pady=2)
 
     def create_network_monitor_section(self, parent):
         """Create network monitoring section"""
@@ -831,15 +1018,28 @@ class StreamlinedSecurityGUI:
                            relief='raised', bd=2, padx=25, pady=8)  # Larger buttons
             btn.pack(side='left', padx=12)  # Increased spacing
         
-        # Output section
+        # Output section with copy button
         output_frame = tk.LabelFrame(hash_frame, text=" Hash Output ", 
                                     font=('Arial', 13, 'bold'), fg='#ffffff', bg='#1a1a1a')  # Larger font
         output_frame.pack(fill='both', expand=True, padx=30, pady=15)  # Increased padding
         
-        self.hash_output = scrolledtext.ScrolledText(output_frame, height=10, bg='#0a0a0a',  # Increased height
+        # Create container for output and copy button
+        output_container = tk.Frame(output_frame, bg='#1a1a1a')
+        output_container.pack(fill='both', expand=True, padx=15, pady=15)
+        output_container.grid_columnconfigure(0, weight=1)
+        output_container.grid_rowconfigure(0, weight=1)
+        
+        self.hash_output = scrolledtext.ScrolledText(output_container, height=10, bg='#0a0a0a',  # Increased height
                                                     fg='#00ff00', font=('Courier New', 11),  # Larger font
                                                     relief='solid', bd=1)
-        self.hash_output.pack(fill='both', expand=True, padx=15, pady=15)  # Increased padding
+        self.hash_output.grid(row=0, column=0, sticky='nsew', padx=(0, 5))
+        
+        # Copy button
+        copy_hash_btn = tk.Button(output_container, text="📋\nCOPY", 
+                                command=self.copy_hash,
+                                bg='#2a2a2a', fg='#00ffff', font=('Arial', 9, 'bold'),
+                                relief='raised', bd=2, width=6)
+        copy_hash_btn.grid(row=0, column=1, sticky='ns', pady=2)
         
         # Educational note
         note_text = "📚 Note: Hash functions are ONE-WAY only. You cannot reverse a hash to get the original text."
@@ -1025,14 +1225,26 @@ class StreamlinedSecurityGUI:
                  bg='#2a2a2a', fg='#00ff00', font=('Arial', 14, 'bold'),
                  relief='raised', bd=3, padx=30, pady=10).pack(pady=20)
         
-        # Output
+        # Output section with copy button
         output_frame = tk.LabelFrame(pwd_frame, text=" Generated Password ", 
                                     font=('Arial', 12, 'bold'), fg='#ffffff', bg='#1a1a1a')
         output_frame.pack(fill='x', padx=50, pady=20)
         
-        self.password_output = tk.Text(output_frame, height=3, bg='#0a0a0a', fg='#00ff00',
+        # Create container for output and copy button
+        output_container = tk.Frame(output_frame, bg='#1a1a1a')
+        output_container.pack(fill='x', padx=20, pady=15)
+        output_container.grid_columnconfigure(0, weight=1)
+        
+        self.password_output = tk.Text(output_container, height=3, bg='#0a0a0a', fg='#00ff00',
                                       font=('Courier New', 14, 'bold'), relief='solid', bd=1)
-        self.password_output.pack(fill='x', padx=20, pady=15)
+        self.password_output.grid(row=0, column=0, sticky='ew', padx=(0, 5))
+        
+        # Copy button
+        copy_pass_btn = tk.Button(output_container, text="📋\nCOPY", 
+                                command=self.copy_password,
+                                bg='#2a2a2a', fg='#00ffff', font=('Arial', 9, 'bold'),
+                                relief='raised', bd=2, width=6)
+        copy_pass_btn.grid(row=0, column=1, sticky='ns')
         
     def create_system_tab(self):
         """Create system monitor tab"""
@@ -1142,8 +1354,24 @@ class StreamlinedSecurityGUI:
             
             self.hash_output.insert(1.0, output_text)
             
+            # Store the hash for copying
+            self.current_hash = result
+            
         except Exception as e:
             pass  # Silent error handling
+    
+    def copy_hash(self):
+        """Copy hash to clipboard"""
+        try:
+            if hasattr(self, 'current_hash') and self.current_hash:
+                self.root.clipboard_clear()
+                self.root.clipboard_append(self.current_hash)
+                self.root.update()
+                messagebox.showinfo("Copied", "✅ Hash copied to clipboard!")
+            else:
+                messagebox.showwarning("No Hash", "⚠️ No hash available to copy. Generate a hash first.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to copy hash: {str(e)}")
     
     # ============================================================================
     # RSA METHODS
@@ -1317,8 +1545,24 @@ class StreamlinedSecurityGUI:
             
             self.password_output.insert(1.0, output_text)
             
+            # Store the password for copying
+            self.current_password = password
+            
         except Exception as e:
             pass  # Silent error handling
+    
+    def copy_password(self):
+        """Copy password to clipboard"""
+        try:
+            if hasattr(self, 'current_password') and self.current_password:
+                self.root.clipboard_clear()
+                self.root.clipboard_append(self.current_password)
+                self.root.update()
+                messagebox.showinfo("Copied", "✅ Password copied to clipboard!")
+            else:
+                messagebox.showwarning("No Password", "⚠️ No password available to copy. Generate a password first.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to copy password: {str(e)}")
     
     def calculate_password_strength(self, password):
         """Calculate password strength"""
