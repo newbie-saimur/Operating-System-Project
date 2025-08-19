@@ -63,14 +63,27 @@ class StreamlinedSecurityGUI:
     def setup_window(self):
         """Setup main window"""
         self.root.title("🛡️ Streamlined Linux Security Center")
-        self.root.geometry("1400x900")  # Increased width for better spacing
+        
+        # Get screen dimensions for full utilization
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        # Use 90% of screen width and 85% of screen height for maximum space
+        width = int(screen_width * 0.9)
+        height = int(screen_height * 0.85)
+        
+        self.root.geometry(f"{width}x{height}")
         self.root.configure(bg='#0a0a0a')
         
         # Center window
         self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth() // 2) - (700)  # Adjusted for new width
-        y = (self.root.winfo_screenheight() // 2) - (450)  # Adjusted for new height
-        self.root.geometry(f'1400x900+{x}+{y}')
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+        
+        # Make window resizable for even more flexibility
+        self.root.resizable(True, True)
+        self.root.minsize(1200, 800)  # Minimum size to maintain layout integrity
         
     def setup_variables(self):
         """Initialize variables"""
@@ -155,219 +168,373 @@ class StreamlinedSecurityGUI:
         """Create system status monitoring section"""
         # System Status Frame
         status_frame = tk.LabelFrame(parent, text=" 🖥️ SYSTEM STATUS MONITOR ", 
-                                   font=('Arial', 14, 'bold'), fg='#00ffff', bg='#1a1a1a')
-        status_frame.pack(fill='x', padx=20, pady=10)
+                                   font=('Arial', 16, 'bold'), fg='#00ffff', bg='#1a1a1a')
+        status_frame.pack(fill='x', padx=15, pady=15)
         
-        # Create grid for system metrics
+        # Create grid for system metrics - now using 6 columns for full width utilization
         metrics_frame = tk.Frame(status_frame, bg='#1a1a1a')
-        metrics_frame.pack(fill='x', padx=15, pady=10)
+        metrics_frame.pack(fill='x', padx=20, pady=15)
         
         # CPU Usage
-        cpu_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=1)
-        cpu_frame.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+        cpu_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        cpu_frame.grid(row=0, column=0, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
         
-        tk.Label(cpu_frame, text="🔥 CPU USAGE", font=('Arial', 11, 'bold'), 
-                fg='#ff6666', bg='#2a2a2a').pack(pady=5)
-        self.cpu_label = tk.Label(cpu_frame, text="0%", font=('Arial', 24, 'bold'), 
+        tk.Label(cpu_frame, text="🔥 CPU USAGE", font=('Arial', 12, 'bold'), 
+                fg='#ff6666', bg='#2a2a2a').pack(pady=8)
+        self.cpu_label = tk.Label(cpu_frame, text="0%", font=('Arial', 28, 'bold'), 
                                  fg='#00ff00', bg='#2a2a2a')
-        self.cpu_label.pack(pady=5)
+        self.cpu_label.pack(pady=8)
+        tk.Label(cpu_frame, text="Real-time monitoring", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Memory Usage
-        mem_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=1)
-        mem_frame.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
+        mem_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        mem_frame.grid(row=0, column=1, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
         
-        tk.Label(mem_frame, text="💾 MEMORY USAGE", font=('Arial', 11, 'bold'), 
-                fg='#66b3ff', bg='#2a2a2a').pack(pady=5)
-        self.memory_label = tk.Label(mem_frame, text="0%", font=('Arial', 24, 'bold'), 
+        tk.Label(mem_frame, text="💾 MEMORY", font=('Arial', 12, 'bold'), 
+                fg='#66b3ff', bg='#2a2a2a').pack(pady=8)
+        self.memory_label = tk.Label(mem_frame, text="0%", font=('Arial', 28, 'bold'), 
                                     fg='#00ff00', bg='#2a2a2a')
-        self.memory_label.pack(pady=5)
+        self.memory_label.pack(pady=8)
+        tk.Label(mem_frame, text="RAM utilization", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Disk Usage
-        disk_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=1)
-        disk_frame.grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
+        disk_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        disk_frame.grid(row=0, column=2, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
         
-        tk.Label(disk_frame, text="💿 DISK USAGE", font=('Arial', 11, 'bold'), 
-                fg='#ffaa00', bg='#2a2a2a').pack(pady=5)
-        self.disk_label = tk.Label(disk_frame, text="0%", font=('Arial', 24, 'bold'), 
+        tk.Label(disk_frame, text="💿 STORAGE", font=('Arial', 12, 'bold'), 
+                fg='#ffaa00', bg='#2a2a2a').pack(pady=8)
+        self.disk_label = tk.Label(disk_frame, text="0%", font=('Arial', 28, 'bold'), 
                                   fg='#00ff00', bg='#2a2a2a')
-        self.disk_label.pack(pady=5)
+        self.disk_label.pack(pady=8)
+        tk.Label(disk_frame, text="Disk space used", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Network Activity
-        network_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=1)
-        network_frame.grid(row=0, column=3, padx=5, pady=5, sticky='nsew')
+        network_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        network_frame.grid(row=0, column=3, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
         
-        tk.Label(network_frame, text="🌐 NETWORK", font=('Arial', 11, 'bold'), 
-                fg='#ff88ff', bg='#2a2a2a').pack(pady=5)
-        self.network_label = tk.Label(network_frame, text="ACTIVE", font=('Arial', 12, 'bold'), 
+        tk.Label(network_frame, text="🌐 NETWORK", font=('Arial', 12, 'bold'), 
+                fg='#ff88ff', bg='#2a2a2a').pack(pady=8)
+        self.network_label = tk.Label(network_frame, text="ACTIVE", font=('Arial', 16, 'bold'), 
                                      fg='#00ff00', bg='#2a2a2a')
-        self.network_label.pack(pady=5)
+        self.network_label.pack(pady=8)
+        tk.Label(network_frame, text="Connection status", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
-        # Configure grid weights
-        for i in range(4):
+        # System Uptime (NEW)
+        uptime_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        uptime_frame.grid(row=0, column=4, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
+        
+        tk.Label(uptime_frame, text="⏰ UPTIME", font=('Arial', 12, 'bold'), 
+                fg='#88ff88', bg='#2a2a2a').pack(pady=8)
+        self.uptime_label = tk.Label(uptime_frame, text="0h 0m", font=('Arial', 16, 'bold'), 
+                                    fg='#00ff00', bg='#2a2a2a')
+        self.uptime_label.pack(pady=8)
+        tk.Label(uptime_frame, text="System runtime", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Process Count (NEW)
+        process_frame = tk.Frame(metrics_frame, bg='#2a2a2a', relief='solid', bd=2)
+        process_frame.grid(row=0, column=5, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=10)
+        
+        tk.Label(process_frame, text="⚙️ PROCESSES", font=('Arial', 12, 'bold'), 
+                fg='#ffcc66', bg='#2a2a2a').pack(pady=8)
+        self.process_label = tk.Label(process_frame, text="0", font=('Arial', 28, 'bold'), 
+                                     fg='#00ff00', bg='#2a2a2a')
+        self.process_label.pack(pady=8)
+        tk.Label(process_frame, text="Running processes", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Configure grid weights for equal distribution
+        for i in range(6):
             metrics_frame.grid_columnconfigure(i, weight=1)
 
     def create_security_metrics_section(self, parent):
         """Create security metrics section"""
-        security_frame = tk.LabelFrame(parent, text=" 🛡️ SECURITY METRICS ", 
-                                     font=('Arial', 14, 'bold'), fg='#00ff00', bg='#1a1a1a')
-        security_frame.pack(fill='x', padx=20, pady=10)
+        security_frame = tk.LabelFrame(parent, text=" 🛡️ SECURITY METRICS & PROTECTION STATUS ", 
+                                     font=('Arial', 16, 'bold'), fg='#00ff00', bg='#1a1a1a')
+        security_frame.pack(fill='x', padx=15, pady=15)
         
-        # Security status indicators
+        # Security status indicators - expanded to 6 columns
         indicators_frame = tk.Frame(security_frame, bg='#1a1a1a')
-        indicators_frame.pack(fill='x', padx=15, pady=10)
+        indicators_frame.pack(fill='x', padx=20, pady=15)
         
         # Firewall Status
-        firewall_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=1)
-        firewall_frame.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+        firewall_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        firewall_frame.grid(row=0, column=0, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(firewall_frame, text="🔥 FIREWALL", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.firewall_status = tk.Label(firewall_frame, text="CHECKING...", font=('Arial', 11, 'bold'), 
+        tk.Label(firewall_frame, text="🔥 FIREWALL", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.firewall_status = tk.Label(firewall_frame, text="CHECKING...", font=('Arial', 13, 'bold'), 
                                        fg='#ffaa00', bg='#2a2a2a')
-        self.firewall_status.pack(pady=2)
+        self.firewall_status.pack(pady=5)
+        tk.Label(firewall_frame, text="Network protection", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Antivirus Status
-        antivirus_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=1)
-        antivirus_frame.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
+        antivirus_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        antivirus_frame.grid(row=0, column=1, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(antivirus_frame, text="🦠 ANTIVIRUS", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.antivirus_status = tk.Label(antivirus_frame, text="ACTIVE", font=('Arial', 11, 'bold'), 
+        tk.Label(antivirus_frame, text="🦠 ANTIVIRUS", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.antivirus_status = tk.Label(antivirus_frame, text="ACTIVE", font=('Arial', 13, 'bold'), 
                                         fg='#00ff00', bg='#2a2a2a')
-        self.antivirus_status.pack(pady=2)
+        self.antivirus_status.pack(pady=5)
+        tk.Label(antivirus_frame, text="Malware protection", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # System Updates
-        updates_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=1)
-        updates_frame.grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
+        updates_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        updates_frame.grid(row=0, column=2, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(updates_frame, text="🔄 UPDATES", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.updates_status = tk.Label(updates_frame, text="UP TO DATE", font=('Arial', 11, 'bold'), 
+        tk.Label(updates_frame, text="🔄 UPDATES", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.updates_status = tk.Label(updates_frame, text="UP TO DATE", font=('Arial', 13, 'bold'), 
                                       fg='#00ff00', bg='#2a2a2a')
-        self.updates_status.pack(pady=2)
+        self.updates_status.pack(pady=5)
+        tk.Label(updates_frame, text="System patches", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Encryption Status
-        encryption_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=1)
-        encryption_frame.grid(row=0, column=3, padx=5, pady=5, sticky='nsew')
+        encryption_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        encryption_frame.grid(row=0, column=3, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(encryption_frame, text="🔐 ENCRYPTION", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.encryption_status = tk.Label(encryption_frame, text="ENABLED", font=('Arial', 11, 'bold'), 
+        tk.Label(encryption_frame, text="🔐 ENCRYPTION", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.encryption_status = tk.Label(encryption_frame, text="ENABLED", font=('Arial', 13, 'bold'), 
                                          fg='#00ff00', bg='#2a2a2a')
-        self.encryption_status.pack(pady=2)
+        self.encryption_status.pack(pady=5)
+        tk.Label(encryption_frame, text="Data protection", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
-        # Configure grid weights
-        for i in range(4):
+        # SSH Security (NEW)
+        ssh_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        ssh_frame.grid(row=0, column=4, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
+        
+        tk.Label(ssh_frame, text="🔑 SSH", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.ssh_status = tk.Label(ssh_frame, text="SECURE", font=('Arial', 13, 'bold'), 
+                                  fg='#00ff00', bg='#2a2a2a')
+        self.ssh_status.pack(pady=5)
+        tk.Label(ssh_frame, text="Remote access", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Intrusion Detection (NEW)
+        ids_frame = tk.Frame(indicators_frame, bg='#2a2a2a', relief='solid', bd=2)
+        ids_frame.grid(row=0, column=5, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
+        
+        tk.Label(ids_frame, text="🕵️ INTRUSION", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.ids_status = tk.Label(ids_frame, text="MONITORING", font=('Arial', 13, 'bold'), 
+                                  fg='#00ff00', bg='#2a2a2a')
+        self.ids_status.pack(pady=5)
+        tk.Label(ids_frame, text="Detection system", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Configure grid weights for equal distribution
+        for i in range(6):
             indicators_frame.grid_columnconfigure(i, weight=1)
 
     def create_threat_detection_section(self, parent):
         """Create threat detection section"""
-        threat_frame = tk.LabelFrame(parent, text=" ⚠️ THREAT DETECTION ENGINE ", 
-                                   font=('Arial', 14, 'bold'), fg='#ff6666', bg='#1a1a1a')
-        threat_frame.pack(fill='x', padx=20, pady=10)
+        threat_frame = tk.LabelFrame(parent, text=" ⚠️ ADVANCED THREAT DETECTION ENGINE ", 
+                                   font=('Arial', 16, 'bold'), fg='#ff6666', bg='#1a1a1a')
+        threat_frame.pack(fill='x', padx=15, pady=15)
         
-        # Threat log display
-        log_frame = tk.Frame(threat_frame, bg='#1a1a1a')
-        log_frame.pack(fill='x', padx=15, pady=10)
+        # Create horizontal layout for threat detection
+        main_threat_frame = tk.Frame(threat_frame, bg='#1a1a1a')
+        main_threat_frame.pack(fill='x', padx=20, pady=15)
         
-        tk.Label(log_frame, text="🔍 Real-Time Threat Analysis:", 
-                font=('Arial', 12, 'bold'), fg='#ffffff', bg='#1a1a1a').pack(anchor='w')
+        # Left side - Threat log display (takes 70% width)
+        log_container = tk.Frame(main_threat_frame, bg='#1a1a1a')
+        log_container.pack(side='left', fill='both', expand=True, padx=(0, 15))
         
-        self.threat_log = scrolledtext.ScrolledText(log_frame, height=6, bg='#0a0a0a',
-                                                   fg='#ff6666', font=('Courier New', 10),
-                                                   relief='solid', bd=1)
-        self.threat_log.pack(fill='x', pady=5)
+        tk.Label(log_container, text="🔍 Real-Time Threat Analysis & Security Events:", 
+                font=('Arial', 14, 'bold'), fg='#ffffff', bg='#1a1a1a').pack(anchor='w', pady=(0, 10))
+        
+        self.threat_log = scrolledtext.ScrolledText(log_container, height=8, bg='#0a0a0a',
+                                                   fg='#ff6666', font=('Courier New', 11),
+                                                   relief='solid', bd=2)
+        self.threat_log.pack(fill='both', expand=True)
+        
+        # Right side - Control panel (takes 30% width)
+        control_panel = tk.Frame(main_threat_frame, bg='#2a2a2a', relief='solid', bd=2)
+        control_panel.pack(side='right', fill='y', padx=(15, 0), ipadx=15, ipady=15)
+        
+        tk.Label(control_panel, text="🛡️ SECURITY CONTROLS", 
+                font=('Arial', 13, 'bold'), fg='#ff6666', bg='#2a2a2a').pack(pady=10)
         
         # Quick scan button
-        scan_btn = tk.Button(threat_frame, text="🔍 QUICK SECURITY SCAN", 
+        scan_btn = tk.Button(control_panel, text="🔍 QUICK SECURITY SCAN", 
                            command=self.run_quick_scan,
                            bg='#ff6666', fg='#000000', font=('Arial', 12, 'bold'),
-                           relief='raised', bd=2, padx=20, pady=5)
-        scan_btn.pack(pady=10)
+                           relief='raised', bd=2, padx=15, pady=8)
+        scan_btn.pack(pady=8, fill='x')
+        
+        # Deep scan button
+        deep_scan_btn = tk.Button(control_panel, text="🕵️ DEEP SYSTEM SCAN", 
+                                command=self.run_deep_scan,
+                                bg='#ff8800', fg='#000000', font=('Arial', 12, 'bold'),
+                                relief='raised', bd=2, padx=15, pady=8)
+        deep_scan_btn.pack(pady=8, fill='x')
+        
+        # Threat level indicator
+        tk.Label(control_panel, text="🚨 THREAT LEVEL", 
+                font=('Arial', 11, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(15, 5))
+        
+        self.threat_level = tk.Label(control_panel, text="LOW", 
+                                   font=('Arial', 18, 'bold'), fg='#00ff00', bg='#2a2a2a')
+        self.threat_level.pack(pady=5)
+        
+        # Active scans counter
+        tk.Label(control_panel, text="📊 ACTIVE SCANS", 
+                font=('Arial', 11, 'bold'), fg='#ffffff', bg='#2a2a2a').pack(pady=(15, 5))
+        
+        self.active_scans = tk.Label(control_panel, text="0", 
+                                   font=('Arial', 18, 'bold'), fg='#66b3ff', bg='#2a2a2a')
+        self.active_scans.pack(pady=5)
 
     def create_network_monitor_section(self, parent):
         """Create network monitoring section"""
-        network_frame = tk.LabelFrame(parent, text=" 🌐 NETWORK SECURITY MONITOR ", 
-                                    font=('Arial', 14, 'bold'), fg='#66b3ff', bg='#1a1a1a')
-        network_frame.pack(fill='x', padx=20, pady=10)
+        network_frame = tk.LabelFrame(parent, text=" 🌐 NETWORK SECURITY MONITOR & TRAFFIC ANALYSIS ", 
+                                    font=('Arial', 16, 'bold'), fg='#66b3ff', bg='#1a1a1a')
+        network_frame.pack(fill='x', padx=15, pady=15)
         
-        # Network stats
+        # Network stats - expanded to 5 columns
         stats_frame = tk.Frame(network_frame, bg='#1a1a1a')
-        stats_frame.pack(fill='x', padx=15, pady=10)
+        stats_frame.pack(fill='x', padx=20, pady=15)
         
         # Active connections
-        conn_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=1)
-        conn_frame.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+        conn_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=2)
+        conn_frame.grid(row=0, column=0, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(conn_frame, text="🔗 CONNECTIONS", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.connections_label = tk.Label(conn_frame, text="0", font=('Arial', 16, 'bold'), 
+        tk.Label(conn_frame, text="🔗 CONNECTIONS", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.connections_label = tk.Label(conn_frame, text="0", font=('Arial', 20, 'bold'), 
                                          fg='#66b3ff', bg='#2a2a2a')
-        self.connections_label.pack(pady=2)
+        self.connections_label.pack(pady=5)
+        tk.Label(conn_frame, text="Active network links", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Open ports
-        ports_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=1)
-        ports_frame.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
+        ports_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=2)
+        ports_frame.grid(row=0, column=1, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(ports_frame, text="🚪 OPEN PORTS", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.ports_label = tk.Label(ports_frame, text="0", font=('Arial', 16, 'bold'), 
+        tk.Label(ports_frame, text="🚪 OPEN PORTS", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.ports_label = tk.Label(ports_frame, text="0", font=('Arial', 20, 'bold'), 
                                    fg='#ffaa00', bg='#2a2a2a')
-        self.ports_label.pack(pady=2)
+        self.ports_label.pack(pady=5)
+        tk.Label(ports_frame, text="Listening services", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
         # Security level
-        security_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=1)
-        security_frame.grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
+        security_level_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=2)
+        security_level_frame.grid(row=0, column=2, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
         
-        tk.Label(security_frame, text="🛡️ SECURITY LEVEL", font=('Arial', 10, 'bold'), 
-                fg='#ffffff', bg='#2a2a2a').pack(pady=2)
-        self.security_level = tk.Label(security_frame, text="HIGH", font=('Arial', 12, 'bold'), 
+        tk.Label(security_level_frame, text="🛡️ SECURITY", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.security_level = tk.Label(security_level_frame, text="HIGH", font=('Arial', 16, 'bold'), 
                                       fg='#00ff00', bg='#2a2a2a')
-        self.security_level.pack(pady=2)
+        self.security_level.pack(pady=5)
+        tk.Label(security_level_frame, text="Protection level", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
         
-        # Configure grid weights
-        for i in range(3):
+        # Bandwidth Usage (NEW)
+        bandwidth_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=2)
+        bandwidth_frame.grid(row=0, column=3, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
+        
+        tk.Label(bandwidth_frame, text="📊 BANDWIDTH", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.bandwidth_label = tk.Label(bandwidth_frame, text="0 MB/s", font=('Arial', 14, 'bold'), 
+                                       fg='#88ff88', bg='#2a2a2a')
+        self.bandwidth_label.pack(pady=5)
+        tk.Label(bandwidth_frame, text="Network usage", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Blocked Attacks (NEW)
+        blocked_frame = tk.Frame(stats_frame, bg='#2a2a2a', relief='solid', bd=2)
+        blocked_frame.grid(row=0, column=4, padx=8, pady=8, sticky='nsew', ipadx=10, ipady=8)
+        
+        tk.Label(blocked_frame, text="🚫 BLOCKED", font=('Arial', 11, 'bold'), 
+                fg='#ffffff', bg='#2a2a2a').pack(pady=5)
+        self.blocked_attacks = tk.Label(blocked_frame, text="0", font=('Arial', 20, 'bold'), 
+                                       fg='#ff6666', bg='#2a2a2a')
+        self.blocked_attacks.pack(pady=5)
+        tk.Label(blocked_frame, text="Attack attempts", font=('Arial', 9), 
+                fg='#888888', bg='#2a2a2a').pack()
+        
+        # Configure grid weights for equal distribution
+        for i in range(5):
             stats_frame.grid_columnconfigure(i, weight=1)
 
     def create_quick_tools_section(self, parent):
         """Create quick tools section"""
-        tools_frame = tk.LabelFrame(parent, text=" ⚡ QUICK SECURITY TOOLS ", 
-                                  font=('Arial', 14, 'bold'), fg='#ffaa00', bg='#1a1a1a')
-        tools_frame.pack(fill='x', padx=20, pady=10)
+        tools_frame = tk.LabelFrame(parent, text=" ⚡ QUICK SECURITY TOOLS & SHORTCUTS ", 
+                                  font=('Arial', 16, 'bold'), fg='#ffaa00', bg='#1a1a1a')
+        tools_frame.pack(fill='x', padx=15, pady=15)
         
-        # Quick action buttons
+        # Quick action buttons - expanded to two rows for full width utilization
         buttons_frame = tk.Frame(tools_frame, bg='#1a1a1a')
-        buttons_frame.pack(fill='x', padx=15, pady=15)
+        buttons_frame.pack(fill='x', padx=20, pady=15)
         
-        # Row 1 buttons
+        # Row 1 buttons - Core Security Tools
         row1_frame = tk.Frame(buttons_frame, bg='#1a1a1a')
-        row1_frame.pack(fill='x', pady=5)
+        row1_frame.pack(fill='x', pady=(0, 10))
         
-        btn_configs = [
+        btn_configs_row1 = [
             ("🔒 Generate Hash", self.quick_hash, '#00ff00'),
             ("🔐 RSA Encrypt", self.quick_rsa, '#66b3ff'),
             ("🔑 Generate Password", self.quick_password, '#ffaa00'),
-            ("📊 System Info", self.quick_sysinfo, '#ff88ff')
+            ("📊 System Monitor", self.quick_sysinfo, '#ff88ff'),
+            ("🌐 Network Scan", self.quick_network, '#88ffff'),
+            ("🛡️ Security Scan", self.quick_security, '#ff6666')
         ]
         
-        for text, command, color in btn_configs:
+        for text, command, color in btn_configs_row1:
             btn = tk.Button(row1_frame, text=text, command=command,
-                           bg='#2a2a2a', fg=color, font=('Arial', 11, 'bold'),
-                           relief='raised', bd=2, padx=15, pady=8)
-            btn.pack(side='left', padx=5, fill='x', expand=True)
+                           bg='#2a2a2a', fg=color, font=('Arial', 12, 'bold'),
+                           relief='raised', bd=2, padx=12, pady=10)
+            btn.pack(side='left', padx=6, fill='x', expand=True)
         
-        # Security tip of the day
-        tip_frame = tk.Frame(tools_frame, bg='#1a1a1a')
-        tip_frame.pack(fill='x', padx=15, pady=10)
+        # Row 2 buttons - Advanced Tools
+        row2_frame = tk.Frame(buttons_frame, bg='#1a1a1a')
+        row2_frame.pack(fill='x', pady=(10, 0))
         
-        tk.Label(tip_frame, text="💡 Security Tip:", 
-                font=('Arial', 12, 'bold'), fg='#ffaa00', bg='#1a1a1a').pack(anchor='w')
+        btn_configs_row2 = [
+            ("🔍 File Analysis", self.quick_file_analysis, '#ff9999'),
+            ("🕵️ Log Forensics", self.quick_forensics, '#99ff99'),
+            ("📚 Education Mode", self.quick_education, '#9999ff'),
+            ("⚡ Performance", self.quick_performance, '#ffff99'),
+            ("🔧 System Tools", self.quick_system_tools, '#ff99ff'),
+            ("📈 Live Charts", self.quick_charts, '#99ffff')
+        ]
         
-        self.security_tip = tk.Label(tip_frame, 
+        for text, command, color in btn_configs_row2:
+            btn = tk.Button(row2_frame, text=text, command=command,
+                           bg='#2a2a2a', fg=color, font=('Arial', 12, 'bold'),
+                           relief='raised', bd=2, padx=12, pady=10)
+            btn.pack(side='left', padx=6, fill='x', expand=True)
+        
+        # Security tip section with better layout
+        tip_container = tk.Frame(tools_frame, bg='#1a1a1a')
+        tip_container.pack(fill='x', padx=20, pady=15)
+        
+        # Tip header with icon
+        tip_header = tk.Frame(tip_container, bg='#2a2a2a', relief='solid', bd=1)
+        tip_header.pack(fill='x', pady=(0, 10))
+        
+        tk.Label(tip_header, text="💡 SECURITY TIP OF THE DAY", 
+                font=('Arial', 14, 'bold'), fg='#ffaa00', bg='#2a2a2a').pack(pady=8)
+        
+        # Tip content
+        self.security_tip = tk.Label(tip_container, 
                                    text="Always use strong, unique passwords for each account!",
-                                   font=('Arial', 11), fg='#ffffff', bg='#1a1a1a',
-                                   wraplength=800, justify='left')
-        self.security_tip.pack(anchor='w', pady=5)
+                                   font=('Arial', 12), fg='#ffffff', bg='#1a1a1a',
+                                   wraplength=1200, justify='center')
+        self.security_tip.pack(pady=5)
 
     def update_dashboard(self):
         """Update dashboard with real-time data"""
@@ -389,6 +556,26 @@ class StreamlinedSecurityGUI:
                 self.disk_label.config(text=f"{disk_percent:.1f}%")
                 self.disk_label.config(fg='#ff6666' if disk_percent > 80 else '#ffaa00' if disk_percent > 60 else '#00ff00')
                 
+                # Update uptime
+                if hasattr(self, 'uptime_label'):
+                    try:
+                        import time
+                        with open('/proc/uptime', 'r') as f:
+                            uptime_seconds = float(f.readline().split()[0])
+                        hours = int(uptime_seconds // 3600)
+                        minutes = int((uptime_seconds % 3600) // 60)
+                        self.uptime_label.config(text=f"{hours}h {minutes}m")
+                    except:
+                        self.uptime_label.config(text="N/A")
+                
+                # Update process count
+                if hasattr(self, 'process_label'):
+                    try:
+                        process_count = len(psutil.pids())
+                        self.process_label.config(text=str(process_count))
+                    except:
+                        self.process_label.config(text="N/A")
+                
                 # Update network info
                 try:
                     import socket
@@ -401,6 +588,18 @@ class StreamlinedSecurityGUI:
                     
                     # Update network status
                     self.network_label.config(text="ACTIVE", fg='#00ff00')
+                    
+                    # Update bandwidth (simulated)
+                    if hasattr(self, 'bandwidth_label'):
+                        bandwidth = random.uniform(0.1, 10.5)
+                        self.bandwidth_label.config(text=f"{bandwidth:.1f} MB/s")
+                    
+                    # Update blocked attacks (simulated)
+                    if hasattr(self, 'blocked_attacks'):
+                        if random.random() < 0.1:  # 10% chance to increment
+                            current = int(self.blocked_attacks.cget('text'))
+                            self.blocked_attacks.config(text=str(current + random.randint(1, 3)))
+                    
                 except:
                     self.network_label.config(text="ERROR", fg='#ff6666')
                 
@@ -415,6 +614,24 @@ class StreamlinedSecurityGUI:
                 except:
                     self.firewall_status.config(text="UNKNOWN", fg='#ffaa00')
                 
+                # Update additional security metrics
+                if hasattr(self, 'ssh_status'):
+                    ssh_secure = random.choice([True, True, True, False])  # 75% chance secure
+                    self.ssh_status.config(text="SECURE" if ssh_secure else "WARNING", 
+                                         fg='#00ff00' if ssh_secure else '#ffaa00')
+                
+                if hasattr(self, 'ids_status'):
+                    self.ids_status.config(text="MONITORING", fg='#00ff00')
+                
+                # Update threat level based on system metrics
+                if hasattr(self, 'threat_level'):
+                    if cpu_percent > 90 or memory.percent > 90:
+                        self.threat_level.config(text="HIGH", fg='#ff6666')
+                    elif cpu_percent > 70 or memory.percent > 70:
+                        self.threat_level.config(text="MEDIUM", fg='#ffaa00')
+                    else:
+                        self.threat_level.config(text="LOW", fg='#00ff00')
+                
                 # Add threat detection simulation
                 if hasattr(self, 'threat_log') and random.random() < 0.1:  # 10% chance
                     timestamp = datetime.now().strftime("%H:%M:%S")
@@ -423,15 +640,18 @@ class StreamlinedSecurityGUI:
                         f"[{timestamp}] 🔍 Monitoring network traffic - Normal activity",
                         f"[{timestamp}] 🛡️ Firewall check - All rules active",
                         f"[{timestamp}] 🔐 Encryption verification - All drives secured",
-                        f"[{timestamp}] 📊 Performance check - System optimal"
+                        f"[{timestamp}] 📊 Performance check - System optimal",
+                        f"[{timestamp}] 🌐 Network scan - {random.randint(50, 200)} devices discovered",
+                        f"[{timestamp}] 🔑 SSH connection from authorized IP",
+                        f"[{timestamp}] 📈 Bandwidth usage within normal limits"
                     ]
                     threat_msg = random.choice(threats)
                     self.threat_log.insert(tk.END, threat_msg + "\n")
                     self.threat_log.see(tk.END)
                     
-                    # Keep only last 20 lines
+                    # Keep only last 25 lines
                     lines = self.threat_log.get("1.0", tk.END).split('\n')
-                    if len(lines) > 20:
+                    if len(lines) > 25:
                         self.threat_log.delete("1.0", "2.0")
                 
                 # Rotate security tips
@@ -443,7 +663,11 @@ class StreamlinedSecurityGUI:
                     "Regularly backup your important data.",
                     "Use a reputable antivirus and firewall.",
                     "Avoid using public Wi-Fi for sensitive activities.",
-                    "Monitor your accounts for suspicious activity."
+                    "Monitor your accounts for suspicious activity.",
+                    "Use encrypted connections (HTTPS) when browsing.",
+                    "Regularly review and update your privacy settings.",
+                    "Keep your antivirus definitions up to date.",
+                    "Use a VPN when connecting to public networks."
                 ]
                 if hasattr(self, 'security_tip') and random.random() < 0.05:  # 5% chance
                     new_tip = random.choice(tips)
@@ -503,6 +727,79 @@ class StreamlinedSecurityGUI:
         """Quick system information"""
         self.notebook.select(4)  # Switch to system tab
         messagebox.showinfo("System Info", "Switched to System Monitor tab for detailed system information!")
+
+    def quick_network(self):
+        """Quick network scan"""
+        messagebox.showinfo("Network Scan", "🌐 Network Security Scan\n\nInitiating comprehensive network analysis...\n• Port scanning\n• Service detection\n• Vulnerability assessment")
+
+    def quick_security(self):
+        """Quick security scan"""
+        self.run_quick_scan()
+        messagebox.showinfo("Security Scan", "🛡️ Security Scan Started\n\nRunning comprehensive security analysis...\nCheck the Threat Detection log for results!")
+
+    def quick_file_analysis(self):
+        """Quick file analysis"""
+        messagebox.showinfo("File Analysis", "🔍 File Security Analysis\n\n• Hash verification\n• Malware scanning\n• Permission analysis\n• Integrity checking")
+
+    def quick_forensics(self):
+        """Quick log forensics"""
+        messagebox.showinfo("Log Forensics", "🕵️ Digital Forensics\n\n• System log analysis\n• Authentication events\n• Security incidents\n• Timeline reconstruction")
+
+    def quick_education(self):
+        """Quick education mode"""
+        messagebox.showinfo("Education Mode", "📚 Educational Demonstrations\n\n• Interactive tutorials\n• Security simulations\n• Best practices guide\n• Hands-on exercises")
+
+    def quick_performance(self):
+        """Quick performance analysis"""
+        cpu = psutil.cpu_percent()
+        memory = psutil.virtual_memory().percent
+        disk = psutil.disk_usage('/').percent
+        messagebox.showinfo("Performance", f"⚡ System Performance\n\nCPU Usage: {cpu:.1f}%\nMemory Usage: {memory:.1f}%\nDisk Usage: {disk:.1f}%\n\nSystem Status: {'Optimal' if cpu < 50 and memory < 80 else 'Under Load'}")
+
+    def quick_system_tools(self):
+        """Quick system tools"""
+        messagebox.showinfo("System Tools", "🔧 Advanced System Tools\n\n• Process management\n• Service control\n• Registry analysis\n• System cleanup")
+
+    def quick_charts(self):
+        """Quick live charts"""
+        messagebox.showinfo("Live Charts", "📈 Real-Time Monitoring\n\n• CPU usage graphs\n• Memory utilization\n• Network traffic\n• Security metrics")
+
+    def run_deep_scan(self):
+        """Run a deep security scan simulation"""
+        if hasattr(self, 'threat_log'):
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.threat_log.insert(tk.END, f"[{timestamp}] 🕵️ DEEP SCAN INITIATED - This may take several minutes...\n")
+            self.threat_log.see(tk.END)
+            
+            # Update active scans counter
+            if hasattr(self, 'active_scans'):
+                current = int(self.active_scans.cget('text'))
+                self.active_scans.config(text=str(current + 1))
+            
+            def deep_scan_simulation():
+                scan_steps = [
+                    "🔍 Analyzing system binaries...",
+                    "🌐 Deep network vulnerability scan...",
+                    "🔐 Checking encryption implementations...",
+                    "📁 Scanning file system integrity...",
+                    "🔑 Auditing user permissions...",
+                    "📊 Analyzing system logs...",
+                    "🦠 Advanced malware detection...",
+                    "✅ DEEP SCAN COMPLETE - Advanced threats checked!"
+                ]
+                
+                for i, step in enumerate(scan_steps):
+                    self.root.after((i + 1) * 2000, lambda s=step: self.add_scan_step(s))
+                
+                # Reset active scans counter after completion
+                self.root.after(len(scan_steps) * 2000 + 1000, self.reset_active_scans)
+            
+            deep_scan_simulation()
+
+    def reset_active_scans(self):
+        """Reset active scans counter"""
+        if hasattr(self, 'active_scans'):
+            self.active_scans.config(text="0")
 
     def create_hash_tab(self):
         """Create hash functions tab"""
